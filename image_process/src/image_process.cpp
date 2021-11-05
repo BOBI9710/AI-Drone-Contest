@@ -16,29 +16,35 @@ void imageCallback(const sensor_msgs::ImageConstPtr& msg)
   try
   {
     Mat img = cv_bridge::toCvShare(msg, "bgr8")->image;
-    
+   
+    //gray
     Mat gray_img;
     cvtColor(img, gray_img, CV_BGR2GRAY);
     
+    //blur
     Mat blur_img;
     GaussianBlur(gray_img, blur_img, Size(7,7), 2, 2);
 
-	Mat img_houghC;
-	blur_img.copyTo(img_houghC);
+    //circle detection
+    Mat img_houghC;
+    img.copyTo(img_houghC);
 	
-	vector<Vec3f> circles;
-	HoughCircles(blur_img, circles, CV_HOUGH_GRADIENT, 1, 30, 130, 50, 0, 0);
+    vector<Vec3f> circles;
+    HoughCircles(blur_img, circles, CV_HOUGH_GRADIENT, 1, 30, 130, 50, 0, 0);
 	
-	for (size_t i = 0; i < circles.size(); i++)
+    for (size_t i = 0; i < circles.size(); i++)
 	{
 		
                 Vec3i c = circles[i];
 		Point center(c[0], c[1]);
 		int radius = c[2];
 
-		circle(img_houghC, center, radius, Scalar(0, 255, 0), 2);
-		circle(img_houghC, center, 2, Scalar(0, 0, 255), 3);
+		circle(img_houghC, center, radius, Scalar (255, 0, 0), 2);
+		circle(img_houghC, center, 2, Scalar (255, 0, 0), 3);
 	}
+
+    //show camera center 
+    circle(img_houghC, Point(160, 120),10, Scalar (255, 0, 255),2 );
 
 
     imshow("view", img_houghC);
